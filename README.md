@@ -15,6 +15,4 @@ docker run -d --name app-roxy --net host \
   tkafka/nginx-self-signed-https:latest
 ```
 
-Note: This is running the container on the host network. It is required that
-port 80 and 443 are not used by any other application. Also this does only work
-when Docker can be ran natively. This won't work on Mac OS X and Windows.
+Note: You can pick your own values for http and https port. 
