@@ -25,4 +25,4 @@ Init once:
 `docker buildx create --use`
 
 Build and push:
-`docker buildx build --platform linux/amd64,linux/arm64 --push -t tomaskafka/tomaskafka/docker-nginx-self-signed-https:latest .`
+`docker buildx build --platform linux/amd64,linux/arm64 --push -t tomaskafka/docker-nginx-self-signed-https:latest .`
