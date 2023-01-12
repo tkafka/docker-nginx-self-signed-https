@@ -16,3 +16,13 @@ docker run -d --name app-proxy --net host \
 ```
 
 Note: You can pick your own values for http and https port. 
+
+## Build and push on m1 - this is the way
+
+See [howto](https://blog.jaimyn.dev/how-to-build-multi-architecture-docker-images-on-an-m1-mac/)
+
+Init once:
+`docker buildx create --use`
+
+Build and push:
+`docker buildx build --platform linux/amd64,linux/arm64 --push -t tomaskafka/tomaskafka/docker-nginx-self-signed-https:latest .`
