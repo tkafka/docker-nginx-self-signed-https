@@ -8,6 +8,13 @@ FROM nginx:1.31-alpine
 # (correct signal handling, etc.).
 COPY templates/default.conf.template /etc/nginx/templates/default.conf.template
 
+# Image version, stamped in via --build-arg VERSION=x.y.z at build time.
+ARG VERSION=dev
+LABEL org.opencontainers.image.title="nginx-self-signed-https" \
+      org.opencontainers.image.description="HTTPS-terminating nginx reverse proxy with bring-your-own certificate" \
+      org.opencontainers.image.source="https://github.com/tkafka/docker-nginx-self-signed-https" \
+      org.opencontainers.image.version="${VERSION}"
+
 ENV REMOTE_URL="http://localhost:8080/" \
     HTTP_PORT=80 \
     HTTPS_PORT=443 \

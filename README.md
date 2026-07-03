@@ -44,9 +44,17 @@ Init once:
 docker buildx create --use
 ```
 
-Build and push:
+Build and push a new version (tag both the version and `latest`):
 
 ```bash
+VERSION=2.0.0
 docker buildx build --platform linux/amd64,linux/arm64 --push \
+  --build-arg VERSION=$VERSION \
+  -t tomaskafka/docker-nginx-self-signed-https:$VERSION \
   -t tomaskafka/docker-nginx-self-signed-https:latest .
 ```
+
+Pin the version (not `latest`) in deployments so updates are explicit, e.g.
+`image: tomaskafka/docker-nginx-self-signed-https:2.0.0`.
+
+Also tag the release in git: `git tag v$VERSION && git push --tags`.
