@@ -44,17 +44,44 @@ Init once:
 docker buildx create --use
 ```
 
-Build and push a new version (tag both the version and `latest`):
+## Versioning
+
+The image follows [semantic versioning](https://semver.org/) and is published
+under three kinds of tags, mirroring the convention used by the official nginx
+image (`1.31.2` / `1.31` / `1`):
+
+| Tag             | Example  | Moves?                          | Use when…                                  |
+| --------------- | -------- | ------------------------------- | ------------------------------------------ |
+| Exact version   | `2.0.0`  | never                           | fully reproducible, frozen deploy          |
+| Major (rolling) | `2`      | re-pointed on every 2.x release | automatic 2.x updates, never a 3.x break   |
+| `latest`        | `latest` | re-pointed on every release     | local testing only — avoid in deployments  |
+
+**Recommended for deployments:** pin the rolling major tag, e.g.
+`image: tomaskafka/docker-nginx-self-signed-https:2`. You get patches and
+minor updates on `docker compose pull` / redeploy, but a major bump (`3.x`) —
+which may break the container contract — is opt-in.
+
+Bump the **major** version for breaking changes (e.g. the 1.x → 2.x change that
+removed the `run.sh` entrypoint; any deployment overriding `command: "/run.sh"`
+must drop that override). Bump **minor**/**patch** for compatible changes.
+
+The chosen version is stamped into the image as the
+`org.opencontainers.image.version` OCI label (via the `VERSION` build arg) and
+tagged in git as `vX.Y.Z`.
+
+### Cut a release
 
 ```bash
-VERSION=2.0.0
+VERSION=2.0.0                 # bump per semver
+MAJOR=${VERSION%%.*}          # -> 2
+
+# 1. tag the code
+git tag -a v$VERSION -m "v$VERSION" && git push --tags
+
+# 2. build + push all three tags in one go
 docker buildx build --platform linux/amd64,linux/arm64 --push \
   --build-arg VERSION=$VERSION \
   -t tomaskafka/docker-nginx-self-signed-https:$VERSION \
+  -t tomaskafka/docker-nginx-self-signed-https:$MAJOR \
   -t tomaskafka/docker-nginx-self-signed-https:latest .
 ```
-
-Pin the version (not `latest`) in deployments so updates are explicit, e.g.
-`image: tomaskafka/docker-nginx-self-signed-https:2.0.0`.
-
-Also tag the release in git: `git tag v$VERSION && git push --tags`.
