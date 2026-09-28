@@ -5,7 +5,8 @@ your locally running service. It acts as an HTTPS-terminating proxy: it accepts
 HTTPS using a certificate you provide and forwards plain HTTP to your app.
 
 Features: HTTP → HTTPS redirect, HTTP/2, WebSocket pass-through, modern TLS
-(1.2/1.3 only), and unbuffered streaming of large uploads/downloads.
+(1.2/1.3 only), unbuffered streaming of large uploads/downloads, and an
+optional path-routed secondary upstream.
 
 ## Usage
 
@@ -25,6 +26,23 @@ docker run -d --name app-proxy --net host \
 Note: You can pick your own values for the HTTP and HTTPS ports. All the values
 above are defaults baked into the image, so you only need to override the ones
 you want to change.
+
+### Optional secondary upstream
+
+Applications can route one path prefix to a second container while keeping all
+other requests on `REMOTE_URL`. Both ordinary HTTP and WebSocket connections
+are supported:
+
+```bash
+-e SECONDARY_PATH_PREFIX=/notification \
+-e SECONDARY_REMOTE_URL=http://notification-server:8083/
+```
+
+When these variables are omitted, the secondary route is disabled and all
+application traffic continues to use `REMOTE_URL`.
+
+As with standard Nginx `proxy_pass` semantics, a trailing slash on the secondary
+URL strips the matched prefix (`/notification/ping` becomes `/ping` upstream).
 
 ## How it works
 

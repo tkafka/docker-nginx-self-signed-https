@@ -40,6 +40,27 @@ server {
   # add_header X-Content-Type-Options nosniff;
   # add_header X-XSS-Protection "1; mode=block";
 
+  # Optional second upstream selected by path prefix. The defaults use an
+  # unreachable sentinel path and the primary upstream, so existing users keep
+  # the original single-upstream behaviour. WebSocket headers are included for
+  # services such as Seafile Notification Server.
+  location ^~ ${SECONDARY_PATH_PREFIX} {
+    resolver 127.0.0.11 ipv6=off;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+
+    proxy_pass ${SECONDARY_REMOTE_URL};
+
+    proxy_read_timeout ${TIMEOUTS_S};
+    send_timeout ${TIMEOUTS_S};
+    proxy_buffering off;
+  }
+
   location / {
     resolver 127.0.0.11 ipv6=off;
     proxy_http_version 1.1;
