@@ -1,6 +1,5 @@
-# Pinned to a minor tag: picks up patch/security updates while staying reproducible.
-# Alpine keeps the image small; it ships the envsubst template entrypoint too.
-FROM nginx:1.31-alpine
+# Pin the patched nginx release. Alpine also ships the envsubst entrypoint.
+FROM nginx:1.31.9-alpine
 
 # The official image renders every /etc/nginx/templates/*.template file through
 # envsubst on startup, writing the result into /etc/nginx/conf.d/. This replaces
