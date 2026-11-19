@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-log=$(mktemp "${TMPDIR:-/tmp}/nginx-image-update.XXXXXX.log")
+log=$(mktemp "${TMPDIR:-/tmp}/nginx-image-update.log.XXXXXX")
 printf 'Release log: %s\n' "$log"
-exec > >(tee -a "$log") 2>&1
+exec 3>&1
+exec >>"$log" 2>&1
 
 work=
 container=
@@ -80,3 +81,4 @@ git commit --allow-empty -m "Release $release with refreshed upstream dependenci
 git tag -a "$tag" -m "Release $release"
 git push --atomic origin "HEAD:refs/heads/$branch" "refs/tags/$tag"
 printf 'Released %s:%s. Log: %s\n' "$image" "$release" "$log"
+printf 'Released %s:%s. Log: %s\n' "$image" "$release" "$log" >&3
